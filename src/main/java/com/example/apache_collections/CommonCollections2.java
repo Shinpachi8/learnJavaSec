@@ -189,7 +189,7 @@ public class CommonCollections2 {
         //如果这里设置为newTransformer, 则会抛出错误, 因为int类型是无法调用newTransformer的
         // 所以要先设置成toString, 然后再用反射设置成newTransformer,
         // 至于为什么设置完后不会触发, 应该是在设置完后,不会直接调用排序
-        // 而且在于,如果直接add一个参数,这个数必须是可以直接调用 compare.tranlate的, 比如queue.add(template)
+        // 而且在于,调用 compare.tranl如果直接add一个参数,这个数必须是可以直接ate的, 比如queue.add(template)
         // 而不能是queue.add(1) `The method 'newTransformer' on 'class java.lang.Integer' does not exist`
 
         Transformer trans = new InvokerTransformer("toString", new Class[0], new Object[0]);
