@@ -1,6 +1,5 @@
 package com.example.apache_collections;
 
-import org.apache.bcel.generic.NEW;
 
 import java.lang.reflect.*;
 
@@ -71,6 +70,7 @@ public class ProxyDymanic {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            System.out.println(proxy.getClass().getName());
             System.out.println("in dymanic proxy invoke method");
             Object result = method.invoke(obj, args);
             System.out.println("dymanic proxy invoke done!");

