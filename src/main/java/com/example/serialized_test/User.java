@@ -12,7 +12,7 @@ public class User  implements Serializable {
         System.out.println("在构造函数中");
     }
 
-    private User(String username){
+    public User(String username){
         System.out.println("在构造函数中");
         this.username = username;
     }
