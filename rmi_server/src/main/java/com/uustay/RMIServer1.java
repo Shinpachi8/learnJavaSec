@@ -1,27 +1,23 @@
-package com.example.rmi_learn;
+package com.uustay;
 
-import java.rmi.Naming;
-import java.rmi.Remote;
+import com.uustay.remoteClass.SubServer;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
-public class rmi_server {
-
+public class RMIServer1 {
     public static void main(String[] args) throws RemoteException {
         try {
+//            System.setProperty("com.sun.jndi.ldap.object.trustURLCodebase", "true");
+            System.setProperty("java.rmi.server.codebase", "http://127.0.0.1:8000/");
 
-            System.setProperty("java.rmi.server.codebase", "http://192.168.1.9:8000/");
-            MyremoteImple obj = new MyremoteImple();
-            URLDownload url = new URLDownload();
-            myremote services = (myremote) UnicastRemoteObject.exportObject(obj, 0);
-
+            ServiceImpl1 obj = new ServiceImpl1();
+            Service services = (Service) UnicastRemoteObject.exportObject( obj, 0);
             Registry reg;
             reg = LocateRegistry.createRegistry(10990);
             reg.rebind("Hello", services);
-            reg.rebind("url", (Remote) url);
-
             System.err.println("Server ready");
         }catch (Exception e){
             System.err.println("Server exception: " + e.toString());

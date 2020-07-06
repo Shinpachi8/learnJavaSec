@@ -10,8 +10,13 @@
 <!--	</parent>-->
 	<groupId>com.example</groupId>
 	<artifactId>demo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>demo</name>
+    <packaging>pom</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <modules>
+        <module>rmi_server</module>
+		<module>rmi_client</module>
+	</modules>
+    <name>demo</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
